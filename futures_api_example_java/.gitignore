@@ -1,0 +1,18 @@
+target/*/
+**/**/target/
+
+*.class
+
+# eclipse
+*.iml
+*.jar
+*.gz
+.settings/
+
+.classpath
+.project
+.factorypath
+
+#idea
+.idea/
+_tmp
