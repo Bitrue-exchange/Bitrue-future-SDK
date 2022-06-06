@@ -1,6 +1,7 @@
 package com.bitrue.futures.sdk.client.utils;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.bitrue.futures.sdk.client.exception.BitrueApiException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
@@ -13,6 +14,7 @@ import java.util.Map;
 import java.util.LinkedHashMap;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
+import org.apache.commons.lang.StringUtils;
 
 public class UrlParamsBuilder {
 
@@ -71,6 +73,10 @@ public class UrlParamsBuilder {
 
     public Boolean checkMethod(String mode) {
         return mode.equals(method);
+    }
+
+    public String getMethod(){
+        return method;
     }
 
     public <T extends Enum> UrlParamsBuilder putToUrl(String name, T value) {
@@ -145,25 +151,37 @@ public class UrlParamsBuilder {
     public String buildUrl() {
         Map<String, String> map = new LinkedHashMap<>(paramsMap.map);
         StringBuilder head = new StringBuilder("");
-        return "?" + AppendUrl(map, head);
-
+        String result = AppendUrl(map, head);
+        if(StringUtils.isBlank(result)){
+            return "";
+        }
+        return "?" + result;
     }
 
-    public String buildSignature() {
-        Map<String, String> map = new LinkedHashMap<>(paramsMap.map);
-        StringBuilder head = new StringBuilder();
-        return AppendUrl(map, head);
-
+    public String buildSignature(String ts, String path) {
+        StringBuilder url = new StringBuilder().append(ts).append(method.toUpperCase()).append(path);
+        String queryString = buildUrl();  // include "?"!!!
+        if(StringUtils.isNotBlank(queryString)){
+            url.append(queryString);
+        }
+        if(method.equals("POST")){
+            url.append(JSON.toJSONString(postBodyMap.map));
+        }
+        return url.toString();
     }
 
     private String AppendUrl(Map<String, String> map, StringBuilder stringBuilder) {
+        boolean first = true;
         for (Map.Entry<String, String> entry : map.entrySet()) {
-            if (!("").equals(stringBuilder.toString())) {
+            if(!first){
                 stringBuilder.append("&");
             }
             stringBuilder.append(entry.getKey());
             stringBuilder.append("=");
             stringBuilder.append(urlEncode(entry.getValue()));
+            if(first) {
+                first = false;
+            }
         }
         return stringBuilder.toString();
     }

@@ -6,7 +6,8 @@ public class FuturesApiConstants {
     /**
      * REST API base URL.
      */
-    public static final String API_BASE_URL = "https://fapi.bitrue.com";
+//    public static final String API_BASE_URL = "https://fapi.bitrue.com";
+    public static final String API_BASE_URL = "https://futuresopenapi.byqian.com";
 
     /**
      * Streaming API base URL.
@@ -34,6 +35,8 @@ public class FuturesApiConstants {
      * Default receiving window.
      */
     public static final long DEFAULT_RECEIVING_WINDOW = 60_000L;
+    public static final String TS_KEY_HEADER = "X-CH-TS";
+    public static final String SIGN_KEY_HEADER = "X-CH-SIGN";
 
     /**
      * Default ToStringStyle used by toString methods. Override this to change the

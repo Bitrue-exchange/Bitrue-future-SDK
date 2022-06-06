@@ -1,11 +1,9 @@
 package com.bitrue.futures.sdk.client;
 
 import com.bitrue.futures.sdk.client.impl.BitrueApiInternalFactory;
-import com.bitrue.futures.sdk.client.model.enums.Interval;
-import com.bitrue.futures.sdk.client.model.market.ContractInfo;
-import com.bitrue.futures.sdk.client.model.market.KlineBar;
-import com.bitrue.futures.sdk.client.model.market.OrderBook;
-import com.bitrue.futures.sdk.client.model.market.PriceChangeTicker;
+import com.bitrue.futures.sdk.client.model.enums.*;
+import com.bitrue.futures.sdk.client.model.market.*;
+import com.bitrue.futures.sdk.client.model.trade.Order;
 
 import java.util.List;
 
@@ -31,4 +29,14 @@ public interface SyncRequestClient {
 
     PriceChangeTicker get24HrTickerPriceChange(String contractName);
 
+    Order placeOrder(String contractName, OrderSide side, PositionActiion action, OrderType orderType,
+                     PositionType positionType, TimeInForce timeInForce, String price, String volume, String clientOrdId);
+
+    Order cancelOrder(String contractName, Long orderId, String clientOrdId);
+
+    ServerTime getServerTime();
+
+    List<Order> getOpenOrder(String contractName);
+
+    Order queryOrder(String s, long l);
 }

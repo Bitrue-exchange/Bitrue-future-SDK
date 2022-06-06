@@ -17,14 +17,18 @@ class ApiSignature {
     private static final String signatureMethodValue = "HmacSHA256";
     public static final String signatureVersionValue = "2";
 
-    void createSignature(String accessKey, String secretKey, UrlParamsBuilder builder) {
+    String createSignature(String ts, String path, String accessKey, String secretKey, UrlParamsBuilder builder) {
 
         if (accessKey == null || "".equals(accessKey) || secretKey == null || "".equals(secretKey)) {
             throw new BitrueApiException(BitrueApiException.KEY_MISSING, "API key and secret key are required");
         }
 
-        builder.putToUrl("recvWindow", Long.toString(FuturesApiConstants.DEFAULT_RECEIVING_WINDOW))
-                .putToUrl("timestamp", Long.toString(System.currentTimeMillis()));
+//        if(builder.getMethod().equals("GET")){
+//            builder.putToUrl("recvWindow", Long.toString(FuturesApiConstants.DEFAULT_RECEIVING_WINDOW));
+//        }
+//        else if(builder.getMethod().equals("POST")){
+//            builder.putToPost("recvWindow",Long.toString(FuturesApiConstants.DEFAULT_RECEIVING_WINDOW));
+//        }
 
         Mac hmacSha256;
         try {
@@ -38,10 +42,11 @@ class ApiSignature {
             throw new BitrueApiException(BitrueApiException.RUNTIME_ERROR,
                     "[Signature] Invalid key: " + e.getMessage());
         }
-        String payload = builder.buildSignature();
-        String actualSign = new String(Hex.encodeHex(hmacSha256.doFinal(payload.getBytes())));
+        String payload = builder.buildSignature(ts, path);
 
-        builder.putToUrl("signature", actualSign);
+        String actualSign = new String(Hex.encodeHex(hmacSha256.doFinal(payload.getBytes())));
+        System.out.println(payload + "|" + secretKey + "|" + actualSign);
+        return actualSign;
 
     }
 

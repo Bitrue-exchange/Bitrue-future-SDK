@@ -28,4 +28,10 @@ public class MarketTest {
         SyncRequestClient client = SyncRequestClient.create();
         System.out.println(client.getKlines("E-BTC-USDT", Interval.forValue("1min"), 300));
     }
+
+    @Test
+    public void testServerTime(){
+        SyncRequestClient client = SyncRequestClient.create();
+        System.out.println(client.getServerTime());
+    }
 }

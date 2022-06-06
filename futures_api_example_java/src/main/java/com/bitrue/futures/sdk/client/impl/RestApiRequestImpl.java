@@ -3,11 +3,12 @@ package com.bitrue.futures.sdk.client.impl;
 import com.bitrue.futures.sdk.client.FuturesApiConstants;
 import com.bitrue.futures.sdk.client.RequestOptions;
 import com.bitrue.futures.sdk.client.exception.BitrueApiException;
-import com.bitrue.futures.sdk.client.model.enums.ContractSide;
-import com.bitrue.futures.sdk.client.model.enums.Interval;
+import com.bitrue.futures.sdk.client.model.enums.*;
 import com.bitrue.futures.sdk.client.model.market.*;
+import com.bitrue.futures.sdk.client.model.trade.Order;
 import com.bitrue.futures.sdk.client.utils.JsonWrapperArray;
 import com.bitrue.futures.sdk.client.utils.UrlParamsBuilder;
+import com.sun.tools.corba.se.idl.constExpr.Or;
 import okhttp3.Request;
 
 import java.math.BigDecimal;
@@ -63,13 +64,16 @@ public class RestApiRequestImpl {
                     "[Invoking] Builder is null when create request with Signature");
         }
         String requestUrl = url + address;
-        new ApiSignature().createSignature(apiKey, secretKey, builder);
+        String ts = String.valueOf(System.currentTimeMillis());
+        String signature = new ApiSignature().createSignature(ts, address, apiKey, secretKey, builder);
         if (builder.hasPostParam()) {
             requestUrl += builder.buildUrl();
             return new Request.Builder().url(requestUrl).post(builder.buildPostBody())
                     .addHeader("Content-Type", "application/json")
                     .addHeader(FuturesApiConstants.API_KEY_HEADER, apiKey)
-                    .addHeader("client_SDK_Version", "binance_futures-1.0.1-java")
+                    .addHeader(FuturesApiConstants.TS_KEY_HEADER, ts)
+                    .addHeader(FuturesApiConstants.SIGN_KEY_HEADER, signature)
+                    .addHeader("client_SDK_Version", "bitrue_futures-0.9.1-java")
                     .build();
         } else if (builder.checkMethod("PUT")) {
             requestUrl += builder.buildUrl();
@@ -77,22 +81,28 @@ public class RestApiRequestImpl {
                     .put(builder.buildPostBody())
                     .addHeader("Content-Type", "application/x-www-form-urlencoded")
                     .addHeader(FuturesApiConstants.API_KEY_HEADER, apiKey)
-                    .addHeader("client_SDK_Version", "binance_futures-1.0.1-java")
+                    .addHeader(FuturesApiConstants.TS_KEY_HEADER, ts)
+                    .addHeader(FuturesApiConstants.SIGN_KEY_HEADER, signature)
+                    .addHeader("client_SDK_Version", "bitrue_futures-0.9.1-java")
                     .build();
         } else if (builder.checkMethod("DELETE")) {
             requestUrl += builder.buildUrl();
             return new Request.Builder().url(requestUrl)
                     .delete()
                     .addHeader("Content-Type", "application/x-www-form-urlencoded")
-                    .addHeader("client_SDK_Version", "binance_futures-1.0.1-java")
+                    .addHeader("client_SDK_Version", "bitrue_futures-0.9.1-java")
+                    .addHeader(FuturesApiConstants.TS_KEY_HEADER, ts)
                     .addHeader(FuturesApiConstants.API_KEY_HEADER, apiKey)
+                    .addHeader(FuturesApiConstants.SIGN_KEY_HEADER, signature)
                     .build();
         } else {
             requestUrl += builder.buildUrl();
             return new Request.Builder().url(requestUrl)
                     .addHeader("Content-Type", "application/x-www-form-urlencoded")
-                    .addHeader("client_SDK_Version", "binance_futures-1.0.1-java")
+                    .addHeader("client_SDK_Version", "bitrue_futures-0.9.1-java")
+                    .addHeader(FuturesApiConstants.TS_KEY_HEADER, ts)
                     .addHeader(FuturesApiConstants.API_KEY_HEADER, apiKey)
+                    .addHeader(FuturesApiConstants.SIGN_KEY_HEADER, signature)
                     .build();
         }
     }
@@ -125,33 +135,47 @@ public class RestApiRequestImpl {
                     .post(builder.buildPostBody())
                     .addHeader("Content-Type", "application/json")
                     .addHeader(FuturesApiConstants.API_KEY_HEADER, apiKey)
-                    .addHeader("client_SDK_Version", "binance_futures-1.0.1-java")
+//                    .addHeader(FuturesApiConstants.TS_KEY_HEADER, System.currentTimeMillis()/1000)
+                    .addHeader("client_SDK_Version", "bitrue_futures-0.9.1-java")
                     .build();
         } else if (builder.checkMethod("DELETE")) {
             return new Request.Builder().url(requestUrl)
                     .delete()
                     .addHeader("Content-Type", "application/x-www-form-urlencoded")
                     .addHeader(FuturesApiConstants.API_KEY_HEADER, apiKey)
-                    .addHeader("client_SDK_Version", "binance_futures-1.0.1-java")
+//                    .addHeader(FuturesApiConstants.TS_KEY_HEADER, System.currentTimeMillis()/1000)
+                    .addHeader("client_SDK_Version", "bitrue_futures-0.9.1-java")
                     .build();
         } else if (builder.checkMethod("PUT")) {
             return new Request.Builder().url(requestUrl)
                     .put(builder.buildPostBody())
                     .addHeader("Content-Type", "application/x-www-form-urlencoded")
                     .addHeader(FuturesApiConstants.API_KEY_HEADER, apiKey)
-                    .addHeader("client_SDK_Version", "binance_futures-1.0.1-java")
+//                    .addHeader(FuturesApiConstants.TS_KEY_HEADER, System.currentTimeMillis()/1000)
+                    .addHeader("client_SDK_Version", "bitrue_futures-0.9.1-java")
                     .build();
         } else {
             return new Request.Builder().url(requestUrl)
                     .addHeader("Content-Type", "application/x-www-form-urlencoded")
                     .addHeader(FuturesApiConstants.API_KEY_HEADER, apiKey)
-                    .addHeader("client_SDK_Version", "binance_futures-1.0.1-java")
+//                    .addHeader(FuturesApiConstants.TS_KEY_HEADER, System.currentTimeMillis()/1000)
+                    .addHeader("client_SDK_Version", "bitrue_futures-0.9.1-java")
                     .build();
         }
     }
 
     private Request createRequestByGetWithApikey(String address, UrlParamsBuilder builder) {
         return createRequestWithApikey(serverUrl, address, builder);
+    }
+
+    RestApiRequest<ServerTime> getServerTime(){
+        RestApiRequest<ServerTime> request = new RestApiRequest<>();
+        UrlParamsBuilder builder = UrlParamsBuilder.build();
+        request.request = createRequestByGet("/fapi/v1/time", builder);
+        request.jsonParser = (jsonWrapper -> {
+            return ServerTime.builder().serverMillis(jsonWrapper.getLong("serverTime")).timeZone(jsonWrapper.getString("timezone")).build();
+        });
+        return request;
     }
 
     RestApiRequest<List<ContractInfo>> getContractList() {
@@ -272,6 +296,91 @@ public class RestApiRequestImpl {
         return request;
     }
 
+    RestApiRequest<Order> postOrder(String contractName, String price, String volume, OrderType orderType,
+                                    OrderSide side, PositionActiion action, PositionType positionType, String clientOrdId,
+                                    TimeInForce timeInForce){
+        RestApiRequest<Order> request = new RestApiRequest<>();
+        UrlParamsBuilder builder = UrlParamsBuilder.build()
+                .putToPost("volume", volume)
+                .putToPost("price", price)
+                .putToPost("contractName", contractName)
+                .putToPost("type", orderType.name())
+                .putToPost("side", side.name())
+                .putToPost("open", action.name())
+                .putToPost("positionType", positionType.getValue())
+                .putToPost("clientOrderId", clientOrdId)
+                .putToPost("timeInForce", timeInForce.name());
 
+        request.request = createRequestByPostWithSignature("/fapi/v1/order", builder);
 
+        request.jsonParser = (jsonWrapper -> {
+            Order result = Order.builder()
+                    .clientOrdId(clientOrdId).orderId(jsonWrapper.getLong("orderId")).price(new BigDecimal(price))
+                    .orgiQty(new BigDecimal(volume)).type(orderType.name()).contractName(contractName).side(side.name())
+                    .postionAction(action.name()).timeInForce(timeInForce.name())
+                    .build();
+            return result;
+        });
+
+        return request;
+    }
+
+    public RestApiRequest<Order> cancelOrder(String contractName, Long orderId, String clientOrdId) {
+        RestApiRequest<Order> request = new RestApiRequest<>();
+        UrlParamsBuilder builder = UrlParamsBuilder.build()
+                .putToPost("orderId", String.valueOf(orderId))
+                .putToPost("contractName", contractName)
+                .putToPost("clientOrderId", clientOrdId);
+        request.request = createRequestByPostWithSignature("/fapi/v1/cancel", builder);
+
+        request.jsonParser = (jsonWrapper -> {
+            Order result = Order.builder()
+                    .clientOrdId(clientOrdId).orderId(jsonWrapper.getLong("orderId")).contractName(contractName)
+                    .build();
+            return result;
+        });
+        return request;
+
+    }
+
+    public RestApiRequest<List<Order>> getOpenOrder(String contractName) {
+        RestApiRequest<List<Order>> request = new RestApiRequest<>();
+        UrlParamsBuilder builder = UrlParamsBuilder.build();
+        builder.putToUrl("contractName", contractName);
+        request.request = createRequestByGetWithSignature("/fapi/v1/openOrders", builder);
+
+        request.jsonParser = (jsonWrapper->{
+            List<Order> result = new ArrayList<>();
+            JsonWrapperArray arr = jsonWrapper.getJsonArray("data");
+            arr.forEach(wrapper -> {
+                Order order = Order.builder().orderId(wrapper.getLong("orderId")).side(wrapper.getString("side"))
+                        .executeQty(wrapper.getBigDecimalOrDefault("executedQty", BigDecimal.ZERO))
+                        .price(wrapper.getBigDecimal("price")).orgiQty(wrapper.getBigDecimal("origQty"))
+                        .avgPrice(wrapper.getBigDecimalOrDefault("avgPrice", BigDecimal.ZERO))
+                        .type(wrapper.getString("type")).status(wrapper.getString("status"))
+                        .postionAction(wrapper.getString("action")).ctime(wrapper.getLong("transactTime")).build();
+                result.add(order);
+            });
+            return result;
+        });
+        return request;
+    }
+
+    public RestApiRequest<Order> queryOrder(String contractName, Long orderId){
+        RestApiRequest<Order> request = new RestApiRequest<>();
+        UrlParamsBuilder builder = UrlParamsBuilder.build();
+        builder.putToUrl("contractName", contractName);
+        builder.putToUrl("orderId", String.valueOf(orderId));
+
+        request.request = createRequestByGetWithSignature("/fapi/v1/order", builder);
+        request.jsonParser = (wrapper -> {
+            return Order.builder().orderId(wrapper.getLong("orderId")).side(wrapper.getString("side"))
+                    .executeQty(wrapper.getBigDecimalOrDefault("executedQty", BigDecimal.ZERO))
+                    .price(wrapper.getBigDecimal("price")).orgiQty(wrapper.getBigDecimal("origQty"))
+                    .avgPrice(wrapper.getBigDecimalOrDefault("avgPrice", BigDecimal.ZERO))
+                    .type(wrapper.getString("type")).status(wrapper.getString("status"))
+                    .postionAction(wrapper.getString("action")).ctime(wrapper.getLong("transactTime")).build();
+        });
+        return request;
+    }
 }
