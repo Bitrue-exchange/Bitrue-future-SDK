@@ -1,6 +1,8 @@
 package com.bitrue.futures.sdk.client.impl;
 
 import com.bitrue.futures.sdk.client.SyncRequestClient;
+import com.bitrue.futures.sdk.client.model.account.Account;
+import com.bitrue.futures.sdk.client.model.account.Position;
 import com.bitrue.futures.sdk.client.model.enums.*;
 import com.bitrue.futures.sdk.client.model.market.*;
 import com.bitrue.futures.sdk.client.model.trade.Order;
@@ -62,5 +64,15 @@ public class SyncRequestImpl implements SyncRequestClient {
     @Override
     public Order queryOrder(String contractName, long orderId) {
         return RestApiInvoker.callSync(requestImpl.queryOrder(contractName, orderId));
+    }
+
+    @Override
+    public List<Account> getAccount() {
+        return RestApiInvoker.callSync(requestImpl.getAccount());
+    }
+
+    @Override
+    public List<Position> getPositions(String contractName){
+        return RestApiInvoker.callSync(requestImpl.getPositions(contractName));
     }
 }

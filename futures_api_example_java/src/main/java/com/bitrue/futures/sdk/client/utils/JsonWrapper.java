@@ -6,6 +6,9 @@ import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.bitrue.futures.sdk.client.exception.BitrueApiException;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -83,6 +86,34 @@ public class JsonWrapper {
         } catch (Exception e) {
             throw new BitrueApiException(BitrueApiException.RUNTIME_ERROR,
                     "[Json] Get boolean error: " + name + " " + e.getMessage());
+        }
+    }
+
+    public ZonedDateTime getDateTime(String name){
+        checkMandatoryField(name);
+        try{
+            return LocalDateTime.parse(json.getString(name))
+                    .atZone(ZoneId.systemDefault())
+                    .withZoneSameInstant(ZoneId.systemDefault());
+        }
+        catch(Exception ex){
+            throw new BitrueApiException(BitrueApiException.RUNTIME_ERROR,
+                    "[Json] Get integer error: " + name + " " + ex.getMessage());
+        }
+    }
+
+    public ZonedDateTime getDateTimeOrDefault(String name, ZonedDateTime def){
+        try{
+            if(!containKey(name)){
+                return def;
+            }
+            return LocalDateTime.parse(json.getString(name))
+                    .atZone(ZoneId.systemDefault())
+                    .withZoneSameInstant(ZoneId.systemDefault());
+        }
+        catch(Exception ex){
+            throw new BitrueApiException(BitrueApiException.RUNTIME_ERROR,
+                    "[Json] Get integer error: " + name + " " + ex.getMessage());
         }
     }
 

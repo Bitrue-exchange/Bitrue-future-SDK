@@ -3,6 +3,9 @@ package com.bitrue.futures.sdk.client.impl;
 import com.bitrue.futures.sdk.client.FuturesApiConstants;
 import com.bitrue.futures.sdk.client.RequestOptions;
 import com.bitrue.futures.sdk.client.exception.BitrueApiException;
+import com.bitrue.futures.sdk.client.model.account.Account;
+import com.bitrue.futures.sdk.client.model.account.Position;
+import com.bitrue.futures.sdk.client.model.account.PositionVO;
 import com.bitrue.futures.sdk.client.model.enums.*;
 import com.bitrue.futures.sdk.client.model.market.*;
 import com.bitrue.futures.sdk.client.model.trade.Order;
@@ -12,9 +15,14 @@ import com.sun.tools.corba.se.idl.constExpr.Or;
 import okhttp3.Request;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 public class RestApiRequestImpl {
 
@@ -383,4 +391,127 @@ public class RestApiRequestImpl {
         });
         return request;
     }
+
+    public RestApiRequest<List<Account>> getAccount() {
+        RestApiRequest<List<Account>> request = new RestApiRequest<>();
+        UrlParamsBuilder builder = UrlParamsBuilder.build();
+
+        request.request = createRequestByGetWithSignature("/fapi/v1/account", builder);
+        request.jsonParser = (rootWrapper ->{
+            List<Account> result = new ArrayList<>();
+            JsonWrapperArray arr = rootWrapper.getJsonArray("account");
+            arr.forEach(accJson -> {
+                Account acct = Account.builder()
+                        .marginCoin(accJson.getString("marginCoin"))
+                        .accountNormal(accJson.getBigDecimal("accountNormal"))
+                        .accountLock(accJson.getBigDecimal("accountLock"))
+                        .isolatedNormal(accJson.getBigDecimal("partPositionNormal"))
+                        .crossNormal(accJson.getBigDecimal("totalPositionNormal"))
+                        .realizedAmount(accJson.getBigDecimal("achievedAmount"))
+                        .unrealizedAmount(accJson.getBigDecimal("unrealizedAmount"))
+                        .totalMarginRate(accJson.getBigDecimal("totalMarginRate"))
+                        .totalEquity(accJson.getBigDecimal("totalEquity"))
+                        .isolatedEquity(accJson.getBigDecimal("partEquity"))
+                        .totalCost(accJson.getBigDecimal("totalCost"))
+                        .sumMarginRate(accJson.getBigDecimal("sumMarginRate")).build();
+
+                List<PositionVO> positionVoList = new ArrayList<>();
+                JsonWrapperArray jsPosVos = accJson.getJsonArray("positionVos");
+                jsPosVos.forEach(voJson ->{
+                    PositionVO vo = PositionVO.builder()
+                            .contractId(voJson.getInteger("contractId"))
+                            .contractName(voJson.getString("contractName"))
+                            .contractSymbol(voJson.getString("contractSymbol")).build();
+
+                    List<Position> posList = new ArrayList<>();
+                    JsonWrapperArray jsonPosList = voJson.getJsonArray("positions");
+                    jsonPosList.forEach(jsonPos ->{
+                        Position pos = Position.builder()
+                                .id(jsonPos.getInteger("id"))
+                                .uid(jsonPos.getInteger("uid"))
+                                .positionType(PositionType.forInt(jsonPos.getInteger("positionType")))
+                                .side(OrderSide.valueOf(jsonPos.getString("side").toUpperCase()))
+                                .volume(jsonPos.getBigDecimal("volume"))
+                                .openPrice(jsonPos.getBigDecimal("openPrice"))
+                                .closePrice(jsonPos.getBigDecimal("closePrice"))
+                                .leverageLevel(new BigDecimal(jsonPos.getInteger("leverageLevel")))
+                                .holdAmount(jsonPos.getBigDecimal("holdAmount"))
+                                .closeVolume(jsonPos.getBigDecimal("closeVolume"))
+                                .pendingCloseVolume(jsonPos.getBigDecimal("pendingCloseVolume"))
+                                .realizedAmount(jsonPos.getBigDecimal("realizedAmount"))
+                                .historyRealizedAmount(jsonPos.getBigDecimal("historyRealizedAmount"))
+                                .tradeFee(jsonPos.getBigDecimal("tradeFee"))
+                                .fundingFee(jsonPos.getBigDecimal("capitalFee"))
+                                .closeProfit(jsonPos.getBigDecimal("closeProfit"))
+                                .shareAmount(jsonPos.getBigDecimal("shareAmount"))
+                                .freezeLock(jsonPos.getInteger("freezeLock"))
+                                .status(jsonPos.getInteger("status"))
+                                .ctime(jsonPos.getDateTime("ctime"))
+                                .mtime(jsonPos.getDateTime("mtime"))
+                                .brokerId(jsonPos.getInteger("brokerId"))
+                                .maintenanceMarginRatio(jsonPos.getBigDecimal("marginRate"))
+                                .liquidationPrice(jsonPos.getBigDecimal("reducePrice"))
+                                .returnRate(jsonPos.getBigDecimal("returnRate"))
+                                .unrealizedAmount(jsonPos.getBigDecimal("unRealizedAmount"))
+                                .openRealizedAmount(jsonPos.getBigDecimal("openRealizedAmount"))
+                                .notional(jsonPos.getBigDecimal("positionBalance"))
+                                .indexPrice(jsonPos.getBigDecimal("indexPrice"))
+                                .maintenanceMarginRatio(jsonPos.getBigDecimal("keepRate"))
+                                .maxFeeRate(jsonPos.getBigDecimal("maxFeeRate"))
+                                .build();
+                        posList.add(pos);
+                    });
+                    vo.setPositions(posList);
+                    positionVoList.add(vo);
+                });
+                acct.setPositions(positionVoList);
+                result.add(acct);
+            });
+            return result;
+        });
+        return request;
+    }
+
+    public RestApiRequest<List<Position>> getPositions(String contractName) {
+        RestApiRequest<List<Position>> request = new RestApiRequest<>();
+        UrlParamsBuilder builder = UrlParamsBuilder.build();
+        builder.putToUrl("contractName", contractName);
+
+        request.request = createRequestByGetWithSignature("/fapi/v1/positions", builder);
+        request.jsonParser = (rootWrapper -> {
+            List<Position> result = new ArrayList<>();
+            JsonWrapperArray jsonPosList = rootWrapper.getJsonArray("positions");
+            jsonPosList.forEach(jsonPos ->{
+                Position pos = Position.builder()
+//                        .id(jsonPos.getInteger("id"))
+                        .contractName(jsonPos.getString("symbol"))
+                        .positionType(PositionType.forInt(jsonPos.getInteger("positionType")))
+                        .side(OrderSide.valueOf(jsonPos.getString("positionSide").toUpperCase()))
+                        .volume(jsonPos.getBigDecimal("positionVolume"))
+                        .openPrice(jsonPos.getBigDecimal("openPrice"))
+                        .leverageLevel(new BigDecimal(jsonPos.getInteger("leverage")))
+                        .holdAmount(jsonPos.getBigDecimal("holdAmount"))
+                        .realizedAmount(jsonPos.getBigDecimal("realizedAmount"))
+                        .ctime(jsonPos.getDateTime("ctime"))
+                        .mtime(jsonPos.getDateTime("mtime"))
+                        .build();
+                result.add(pos);
+            });
+            return result;
+        });
+        return request;
+    }
+
+//    public static void main(String[] args){
+//        ZoneId utc = ZoneId.of("Etc/UTC");
+//        DateTimeFormatter targetFormatter = DateTimeFormatter.ofPattern(
+//                "MM/dd/yyyy hh:mm:ss a zzz", Locale.ENGLISH);
+//
+//        String itsAlarmDttm = "2013-10-22T01:37:56";
+//        ZonedDateTime utcDateTime = LocalDateTime.parse(itsAlarmDttm)
+//                .atZone(ZoneId.systemDefault())
+//                .withZoneSameInstant(utc);
+//        String formatterUtcDateTime = utcDateTime.format(targetFormatter);
+//        System.out.println(formatterUtcDateTime);
+//    }
 }

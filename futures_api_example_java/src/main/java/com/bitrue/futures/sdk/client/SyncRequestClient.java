@@ -1,6 +1,8 @@
 package com.bitrue.futures.sdk.client;
 
 import com.bitrue.futures.sdk.client.impl.BitrueApiInternalFactory;
+import com.bitrue.futures.sdk.client.model.account.Account;
+import com.bitrue.futures.sdk.client.model.account.Position;
 import com.bitrue.futures.sdk.client.model.enums.*;
 import com.bitrue.futures.sdk.client.model.market.*;
 import com.bitrue.futures.sdk.client.model.trade.Order;
@@ -39,4 +41,8 @@ public interface SyncRequestClient {
     List<Order> getOpenOrder(String contractName);
 
     Order queryOrder(String s, long l);
+
+    List<Account> getAccount();
+
+    List<Position> getPositions(String contractName);
 }

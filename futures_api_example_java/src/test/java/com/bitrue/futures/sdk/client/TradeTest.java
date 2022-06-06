@@ -23,7 +23,7 @@ public class TradeTest {
 
     }
 
-    @Test
+//    @Test
     public void testCancel(){
         SyncRequestClient client = SyncRequestClient.create(PrivateConfig.API_KEY, PrivateConfig.SECRET_KEY, new RequestOptions());
         Order ord = Order.builder().clientOrdId("1534994023").orderId(1141178101970600166L).contractName("E-ETH-USDT").build();
@@ -42,4 +42,5 @@ public class TradeTest {
         SyncRequestClient client = SyncRequestClient.create(PrivateConfig.API_KEY, PrivateConfig.SECRET_KEY, new RequestOptions());
         System.out.println(client.queryOrder("E-ETH-USDT", 1141178101970600166L));
     }
+
 }
