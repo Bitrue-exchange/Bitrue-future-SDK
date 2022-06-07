@@ -16,9 +16,9 @@ except Exception as ex:
 
 class FutureClient(object):
 
-    API_URL =  'https://futuresopenapi.byqian.{}/fapi'   # 'https://fapi.bitrue.{}/fapi'        #
-    FUTURES_URL = 'https://futuresopenapi.byqian.{}/fapi'    #'https://fapi.bitrue.{}/fapi'    # 
-    WEBSITE_URL = 'https://www.byqian.{}'                  # 'https://www.bitrue.{}'          # 
+    API_URL =  'https://fapi.bitrue.{}/fapi'
+    FUTURES_URL = 'https://fapi.bitrue.{}/fapi'
+    WEBSITE_URL = 'https://www.bitrue.{}'
     
     PUBLIC_API_VERSION = 'v1'
     PRIVATE_API_VERSION = 'v1'
