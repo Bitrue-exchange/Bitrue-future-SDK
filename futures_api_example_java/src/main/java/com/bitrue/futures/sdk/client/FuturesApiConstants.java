@@ -6,8 +6,7 @@ public class FuturesApiConstants {
     /**
      * REST API base URL.
      */
-//    public static final String API_BASE_URL = "https://fapi.bitrue.com";
-    public static final String API_BASE_URL = "https://futuresopenapi.byqian.com";
+    public static final String API_BASE_URL = "https://fapi.bitrue.com";
 
     /**
      * Streaming API base URL.
