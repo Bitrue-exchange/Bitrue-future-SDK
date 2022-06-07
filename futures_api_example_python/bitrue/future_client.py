@@ -16,14 +16,12 @@ except Exception as ex:
 
 class FutureClient(object):
 
-    API_URL = 'https://fapi.bitrue.{}/fapi'        # 'https://futuresopenapi.byqian.{}/fapi'
-    FUTURES_URL = 'https://fapi.bitrue.{}/fapi'    # 'https://futuresopenapi.byqian.{}/fapi'
-    WEBSITE_URL = 'https://www.bitrue.{}'          # 'https://www.byqian.{}'
+    API_URL =  'https://futuresopenapi.byqian.{}/fapi'   # 'https://fapi.bitrue.{}/fapi'        #
+    FUTURES_URL = 'https://futuresopenapi.byqian.{}/fapi'    #'https://fapi.bitrue.{}/fapi'    # 
+    WEBSITE_URL = 'https://www.byqian.{}'                  # 'https://www.bitrue.{}'          # 
     
     PUBLIC_API_VERSION = 'v1'
     PRIVATE_API_VERSION = 'v1'
-    
-    SYMBOL_TYPE_SPOT = 'SPOT'
 
     ORDER_STATUS_NEW = 'NEW'
     ORDER_STATUS_PARTIALLY_FILLED = 'PARTIALLY_FILLED'
@@ -33,32 +31,20 @@ class FutureClient(object):
     ORDER_STATUS_REJECTED = 'REJECTED'
     ORDER_STATUS_EXPIRED = 'EXPIRED'
 
-    KLINE_INTERVAL_1MINUTE = '1m'
-    KLINE_INTERVAL_3MINUTE = '3m'
-    KLINE_INTERVAL_5MINUTE = '5m'
-    KLINE_INTERVAL_15MINUTE = '15m'
-    KLINE_INTERVAL_30MINUTE = '30m'
+    KLINE_INTERVAL_1MINUTE = '1min'
+    KLINE_INTERVAL_5MINUTE = '5min'
+    KLINE_INTERVAL_15MINUTE = '15min'
+    KLINE_INTERVAL_30MINUTE = '30min'
     KLINE_INTERVAL_1HOUR = '1h'
-    KLINE_INTERVAL_2HOUR = '2h'
-    KLINE_INTERVAL_4HOUR = '4h'
-    KLINE_INTERVAL_6HOUR = '6h'
-    KLINE_INTERVAL_8HOUR = '8h'
-    KLINE_INTERVAL_12HOUR = '12h'
-    KLINE_INTERVAL_1DAY = '1d'
-    KLINE_INTERVAL_3DAY = '3d'
-    KLINE_INTERVAL_1WEEK = '1w'
-    KLINE_INTERVAL_1MONTH = '1M'
+    KLINE_INTERVAL_1DAY = '1day'
+    KLINE_INTERVAL_1WEEK = '1week'
+    KLINE_INTERVAL_1MONTH = '1month'
 
     SIDE_BUY = 'BUY'
     SIDE_SELL = 'SELL'
 
     ORDER_TYPE_LIMIT = 'LIMIT'
     ORDER_TYPE_MARKET = 'MARKET'
-    ORDER_TYPE_STOP_LOSS = 'STOP_LOSS'
-    ORDER_TYPE_STOP_LOSS_LIMIT = 'STOP_LOSS_LIMIT'
-    ORDER_TYPE_TAKE_PROFIT = 'TAKE_PROFIT'
-    ORDER_TYPE_TAKE_PROFIT_LIMIT = 'TAKE_PROFIT_LIMIT'
-    ORDER_TYPE_LIMIT_MAKER = 'LIMIT_MAKER'
 
     TIME_IN_FORCE_GTC = 'GTC'  # Good till cancelled
     TIME_IN_FORCE_IOC = 'IOC'  # Immediate or cancel
@@ -67,16 +53,6 @@ class FutureClient(object):
     ORDER_RESP_TYPE_ACK = 'ACK'
     ORDER_RESP_TYPE_RESULT = 'RESULT'
     ORDER_RESP_TYPE_FULL = 'FULL'
-
-    # For accessing the data returned by Client.aggregate_trades().
-    AGG_ID = 'a'
-    AGG_PRICE = 'p'
-    AGG_QUANTITY = 'q'
-    AGG_FIRST_TRADE_ID = 'f'
-    AGG_LAST_TRADE_ID = 'l'
-    AGG_TIME = 'T'
-    AGG_BUYER_MAKES = 'm'
-    AGG_BEST_MATCH = 'M'
 
 
     def __init__(self, api_key=None, api_secret=None, requests_params=None, tld='com'):
@@ -90,13 +66,9 @@ class FutureClient(object):
         """
 
         self.API_URL = self.API_URL.format(tld)
-        # self.WITHDRAW_API_URL = self.WITHDRAW_API_URL.format(tld)
-        # self.MARGIN_API_URL = self.MARGIN_API_URL.format(tld)
         self.WEBSITE_URL = self.WEBSITE_URL.format(tld)
         self.FUTURES_URL = self.FUTURES_URL.format(tld)
-        # self.FUTURES_DATA_URL = self.FUTURES_DATA_URL.format(tld)
-        # self.FUTURES_COIN_URL = self.FUTURES_COIN_URL.format(tld)
-        # self.FUTURES_COIN_DATA_URL = self.FUTURES_COIN_DATA_URL.format(tld)
+        
 
         self.API_KEY = api_key
         self.API_SECRET = api_secret
@@ -116,7 +88,7 @@ class FutureClient(object):
         session.headers.update({
             'Accept': 'application/json',
             'User-Agent': 'Bitrue/Python',
-            'X-MBX-APIKEY': self.API_KEY
+
         })
         return session
     
@@ -128,7 +100,7 @@ class FutureClient(object):
     
     def _generate_signature(self, ts, method, path, params={}, payload=None):
         # sig_explain = '&'.join(["{}={}".format(k, v) for k, v in body.items()])
-        print(params)
+        # print(params)
         if params:
             qs = '&'.join(["{}={}".format(k, v) for k, v in params.items()])
             if path.find('?') == -1:
@@ -136,7 +108,7 @@ class FutureClient(object):
             sig_explain = "%d%s%s%s%s" %(ts, method.upper(), path, qs, "" if not payload else payload)
         else:
             sig_explain = "%d%s%s%s" %(ts, method.upper(), path, "" if not payload else payload)
-        print("\n\n", sig_explain, "\n\n")
+        # print("\n\n", sig_explain, "\n\n")
 
         m = hmac.new(self.API_SECRET.encode("utf-8"), sig_explain.encode('utf-8'), hashlib.sha256)
         return m.hexdigest()
@@ -191,7 +163,7 @@ class FutureClient(object):
             headers['X-CH-SIGN'] = self._generate_signature(ts, method, path, params=kwargs.get('params',{}), payload=a_payload)
         # print(headers)
         kwargs.update({'headers' :headers})
-        print(kwargs)
+        # print(kwargs)
         
         self.response = getattr(self.session, method)(uri, **kwargs)
         return self._handle_response()
@@ -317,7 +289,7 @@ class FutureClient(object):
     def get_order(self, **params):
         """Check an order's status. Either orderId or origClientOrderId must be sent.
         """
-        return self._get('order', True, data=params)
+        return self._get('order', True, params=params)
     
     def cancel_order(self, **params):
         """Cancel an active order. Either orderId or origClientOrderId must be sent.
@@ -330,12 +302,12 @@ class FutureClient(object):
         # data = self.extend_timestamp(params)
         # print(data)
         # params['timestamp'] = int(time.time() * 1000 + self.timestamp_offset)
-        return self._get('openOrders', True, data=params)
+        return self._get('openOrders', True, params=params)
     
     def get_account(self, **params):
         """Get current account information.
         """
-        return self._get('account', True, data=params)
+        return self._get('account', True, params=params)
     
     def get_asset_balance(self, asset, **params):
         """Get current asset balance.
