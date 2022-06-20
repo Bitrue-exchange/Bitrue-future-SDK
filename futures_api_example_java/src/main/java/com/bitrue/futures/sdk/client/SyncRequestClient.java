@@ -34,6 +34,8 @@ public interface SyncRequestClient {
     Order placeOrder(String contractName, OrderSide side, PositionActiion action, OrderType orderType,
                      PositionType positionType, TimeInForce timeInForce, String price, String volume, String clientOrdId);
 
+    Order marketOrder(String contractName, OrderSide side, PositionActiion action, PositionType positionType, String volume, String clientOrderId);
+
     Order cancelOrder(String contractName, Long orderId, String clientOrdId);
 
     ServerTime getServerTime();

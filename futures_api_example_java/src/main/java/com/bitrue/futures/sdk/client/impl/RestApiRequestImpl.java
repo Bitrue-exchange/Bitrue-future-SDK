@@ -333,6 +333,32 @@ public class RestApiRequestImpl {
         return request;
     }
 
+    RestApiRequest<Order> marketOrder(String contractName, String volume, OrderSide side, PositionActiion action, PositionType positionType, String clientOrdId){
+        RestApiRequest<Order> request = new RestApiRequest<>();
+        UrlParamsBuilder builder = UrlParamsBuilder.build()
+                .putToPost("volume", volume)
+                .putToPost("contractName", contractName)
+                .putToPost("type", OrderType.MARKET.name())
+                .putToPost("side", side.name())
+                .putToPost("open", action.name())
+                .putToPost("positionType", positionType.getValue())
+                .putToPost("clientOrderId", clientOrdId)
+                .putToPost("timeInForce", OrderType.MARKET.name());
+
+        request.request = createRequestByPostWithSignature("/fapi/v1/order", builder);
+
+        request.jsonParser = (jsonWrapper -> {
+            Order result = Order.builder()
+                    .clientOrdId(clientOrdId).orderId(jsonWrapper.getLong("orderId"))
+                    .orgiQty(new BigDecimal(volume)).type(OrderType.MARKET.name()).contractName(contractName).side(side.name())
+                    .postionAction(action.name()).timeInForce(OrderType.MARKET.name())
+                    .build();
+            return result;
+        });
+
+        return request;
+    }
+
     public RestApiRequest<Order> cancelOrder(String contractName, Long orderId, String clientOrdId) {
         RestApiRequest<Order> request = new RestApiRequest<>();
         UrlParamsBuilder builder = UrlParamsBuilder.build()
