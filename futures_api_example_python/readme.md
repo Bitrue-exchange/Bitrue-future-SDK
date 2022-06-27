@@ -1,8 +1,8 @@
 Getting Started
 ==============
 
-1. retrieve your API-key/Secret-key.
-2. setup & run
+1. Retrieve your API-key / Secret-key.
+2. Setup & Run
 
 ``` python
 
