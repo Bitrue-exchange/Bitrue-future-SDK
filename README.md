@@ -1,6 +1,6 @@
 # futures_api_examples
-demo for Bitrue future open APIs
+Demo for Biture Futures Open APIs
 
-[java](futures_api_example_java/readme.md)
+[Java](futures_api_example_java/readme.md)
 
-[python](futures_api_example_python/readme.md)
+[Python](futures_api_example_python/readme.md)
