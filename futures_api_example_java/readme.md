@@ -1,12 +1,12 @@
 ## Getting started
 
-#### public API
+#### Public API
 
 * junit
 run MarketTest
   
 
-#### trade & account API
+#### Trade & Account API
 
 ``` java
 
