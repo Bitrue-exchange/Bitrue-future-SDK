@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public class TradeTest {
 
-    @Test
+//    @Test
     public void testPlaceOrder(){
         SyncRequestClient client = SyncRequestClient.create(PrivateConfig.API_KEY, PrivateConfig.SECRET_KEY, new RequestOptions());
         int i = UUID.randomUUID().hashCode();
@@ -22,6 +22,22 @@ public class TradeTest {
 //        testCancel(ord);
 
     }
+
+    @Test
+    public void testInversePlaceOrder(){
+        SyncRequestClient client = SyncRequestClient.createInverse(PrivateConfig.API_KEY, PrivateConfig.SECRET_KEY, new RequestOptions());
+        int i = UUID.randomUUID().hashCode();
+//        Response =====> {"orderId":"1194156214330328799"}
+        Order ord = client.placeOrder(
+                "E-BTC-USD", OrderSide.BUY, PositionActiion.OPEN, OrderType.LIMIT, PositionType.CROSS,
+                TimeInForce.LIMIT, "20111", "100", String.valueOf(i < 0 ? i * -1 : i)
+        );
+        System.out.println(ord);
+
+//        testCancel(ord);
+
+    }
+
 
 //    @Test
     public void testCancel(){
@@ -38,9 +54,20 @@ public class TradeTest {
     }
 
     @Test
+    public void testInverseOpenOrders(){
+        SyncRequestClient client = SyncRequestClient.createInverse(PrivateConfig.API_KEY, PrivateConfig.SECRET_KEY, new RequestOptions());
+        System.out.println(client.getOpenOrder("E-BTC-USD"));
+    }
+
+    @Test
     public void testQueryOrder(){
         SyncRequestClient client = SyncRequestClient.create(PrivateConfig.API_KEY, PrivateConfig.SECRET_KEY, new RequestOptions());
         System.out.println(client.queryOrder("E-ETH-USDT", 1141178101970600166L));
     }
 
+    @Test
+    public void testInverseQueryOrder(){
+        SyncRequestClient client = SyncRequestClient.createInverse(PrivateConfig.API_KEY, PrivateConfig.SECRET_KEY, new RequestOptions());
+        System.out.println(client.queryOrder("E-BTC-USD", 1194156214330328799L));
+    }
 }

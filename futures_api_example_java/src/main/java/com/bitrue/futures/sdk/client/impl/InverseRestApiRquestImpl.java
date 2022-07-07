@@ -1,8 +1,6 @@
 package com.bitrue.futures.sdk.client.impl;
 
-import com.bitrue.futures.sdk.client.FuturesApiConstants;
 import com.bitrue.futures.sdk.client.RequestOptions;
-import com.bitrue.futures.sdk.client.exception.BitrueApiException;
 import com.bitrue.futures.sdk.client.model.account.Account;
 import com.bitrue.futures.sdk.client.model.account.Position;
 import com.bitrue.futures.sdk.client.model.account.PositionVO;
@@ -11,185 +9,34 @@ import com.bitrue.futures.sdk.client.model.market.*;
 import com.bitrue.futures.sdk.client.model.trade.Order;
 import com.bitrue.futures.sdk.client.utils.JsonWrapperArray;
 import com.bitrue.futures.sdk.client.utils.UrlParamsBuilder;
-import com.sun.tools.corba.se.idl.constExpr.Or;
-import okhttp3.Request;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 
-public class RestApiRequestImpl {
+public class InverseRestApiRquestImpl extends RestApiRequestImpl{
 
-    private String apiKey;
-    private String secretKey;
-    private String serverUrl;
-
-    RestApiRequestImpl(String apiKey, String secretKey, RequestOptions options) {
-        this.apiKey = apiKey;
-        this.secretKey = secretKey;
-        this.serverUrl = options.getUrl();
+    InverseRestApiRquestImpl(String apiKey, String secretKey, RequestOptions options) {
+        super(apiKey, secretKey, options);
     }
 
-
-    Request createRequestByGet(String address, UrlParamsBuilder builder) {
-//        System.out.println(serverUrl);
-        return createRequestByGet(serverUrl, address, builder);
-    }
-
-    Request createRequestByGet(String url, String address, UrlParamsBuilder builder) {
-        return createRequest(url, address, builder);
-    }
-
-    Request createRequest(String url, String address, UrlParamsBuilder builder) {
-        String requestUrl = url + address;
-        System.out.print(requestUrl);
-        if (builder != null) {
-            if (builder.hasPostParam()) {
-                return new Request.Builder().url(requestUrl).post(builder.buildPostBody())
-                        .addHeader("Content-Type", "application/json")
-                        .addHeader("client_SDK_Version", "bitrue_futures-0.9.1-java").build();
-            } else {
-                return new Request.Builder().url(requestUrl + builder.buildUrl())
-                        .addHeader("Content-Type", "application/x-www-form-urlencoded")
-                        .addHeader("client_SDK_Version", "bitrue_futures-0.9.1-java").build();
-            }
-        } else {
-            return new Request.Builder().url(requestUrl).addHeader("Content-Type", "application/x-www-form-urlencoded")
-                    .addHeader("client_SDK_Version", "bitrue_futures-0.9.1-java")
-                    .build();
-        }
-    }
-
-    Request createRequestWithSignature(String url, String address, UrlParamsBuilder builder) {
-        if (builder == null) {
-            throw new BitrueApiException(BitrueApiException.RUNTIME_ERROR,
-                    "[Invoking] Builder is null when create request with Signature");
-        }
-        String requestUrl = url + address;
-        String ts = String.valueOf(System.currentTimeMillis());
-        String signature = new ApiSignature().createSignature(ts, address, apiKey, secretKey, builder);
-        if (builder.hasPostParam()) {
-            requestUrl += builder.buildUrl();
-            return new Request.Builder().url(requestUrl).post(builder.buildPostBody())
-                    .addHeader("Content-Type", "application/json")
-                    .addHeader(FuturesApiConstants.API_KEY_HEADER, apiKey)
-                    .addHeader(FuturesApiConstants.TS_KEY_HEADER, ts)
-                    .addHeader(FuturesApiConstants.SIGN_KEY_HEADER, signature)
-                    .addHeader("client_SDK_Version", "bitrue_futures-0.9.1-java")
-                    .build();
-        } else if (builder.checkMethod("PUT")) {
-            requestUrl += builder.buildUrl();
-            return new Request.Builder().url(requestUrl)
-                    .put(builder.buildPostBody())
-                    .addHeader("Content-Type", "application/x-www-form-urlencoded")
-                    .addHeader(FuturesApiConstants.API_KEY_HEADER, apiKey)
-                    .addHeader(FuturesApiConstants.TS_KEY_HEADER, ts)
-                    .addHeader(FuturesApiConstants.SIGN_KEY_HEADER, signature)
-                    .addHeader("client_SDK_Version", "bitrue_futures-0.9.1-java")
-                    .build();
-        } else if (builder.checkMethod("DELETE")) {
-            requestUrl += builder.buildUrl();
-            return new Request.Builder().url(requestUrl)
-                    .delete()
-                    .addHeader("Content-Type", "application/x-www-form-urlencoded")
-                    .addHeader("client_SDK_Version", "bitrue_futures-0.9.1-java")
-                    .addHeader(FuturesApiConstants.TS_KEY_HEADER, ts)
-                    .addHeader(FuturesApiConstants.API_KEY_HEADER, apiKey)
-                    .addHeader(FuturesApiConstants.SIGN_KEY_HEADER, signature)
-                    .build();
-        } else {
-            requestUrl += builder.buildUrl();
-            return new Request.Builder().url(requestUrl)
-                    .addHeader("Content-Type", "application/x-www-form-urlencoded")
-                    .addHeader("client_SDK_Version", "bitrue_futures-0.9.1-java")
-                    .addHeader(FuturesApiConstants.TS_KEY_HEADER, ts)
-                    .addHeader(FuturesApiConstants.API_KEY_HEADER, apiKey)
-                    .addHeader(FuturesApiConstants.SIGN_KEY_HEADER, signature)
-                    .build();
-        }
-    }
-
-    Request createRequestByPostWithSignature(String address, UrlParamsBuilder builder) {
-        return createRequestWithSignature(serverUrl, address, builder.setMethod("POST"));
-    }
-
-    Request createRequestByGetWithSignature(String address, UrlParamsBuilder builder) {
-        return createRequestWithSignature(serverUrl, address, builder);
-    }
-
-    Request createRequestByPutWithSignature(String address, UrlParamsBuilder builder) {
-        return createRequestWithSignature(serverUrl, address, builder.setMethod("PUT"));
-    }
-
-    Request createRequestByDeleteWithSignature(String address, UrlParamsBuilder builder) {
-        return createRequestWithSignature(serverUrl, address, builder.setMethod("DELETE"));
-    }
-
-    Request createRequestWithApikey(String url, String address, UrlParamsBuilder builder) {
-        if (builder == null) {
-            throw new BitrueApiException(BitrueApiException.RUNTIME_ERROR,
-                    "[Invoking] Builder is null when create request with Signature");
-        }
-        String requestUrl = url + address;
-        requestUrl += builder.buildUrl();
-        if (builder.hasPostParam()) {
-            return new Request.Builder().url(requestUrl)
-                    .post(builder.buildPostBody())
-                    .addHeader("Content-Type", "application/json")
-                    .addHeader(FuturesApiConstants.API_KEY_HEADER, apiKey)
-//                    .addHeader(FuturesApiConstants.TS_KEY_HEADER, System.currentTimeMillis()/1000)
-                    .addHeader("client_SDK_Version", "bitrue_futures-0.9.1-java")
-                    .build();
-        } else if (builder.checkMethod("DELETE")) {
-            return new Request.Builder().url(requestUrl)
-                    .delete()
-                    .addHeader("Content-Type", "application/x-www-form-urlencoded")
-                    .addHeader(FuturesApiConstants.API_KEY_HEADER, apiKey)
-//                    .addHeader(FuturesApiConstants.TS_KEY_HEADER, System.currentTimeMillis()/1000)
-                    .addHeader("client_SDK_Version", "bitrue_futures-0.9.1-java")
-                    .build();
-        } else if (builder.checkMethod("PUT")) {
-            return new Request.Builder().url(requestUrl)
-                    .put(builder.buildPostBody())
-                    .addHeader("Content-Type", "application/x-www-form-urlencoded")
-                    .addHeader(FuturesApiConstants.API_KEY_HEADER, apiKey)
-//                    .addHeader(FuturesApiConstants.TS_KEY_HEADER, System.currentTimeMillis()/1000)
-                    .addHeader("client_SDK_Version", "bitrue_futures-0.9.1-java")
-                    .build();
-        } else {
-            return new Request.Builder().url(requestUrl)
-                    .addHeader("Content-Type", "application/x-www-form-urlencoded")
-                    .addHeader(FuturesApiConstants.API_KEY_HEADER, apiKey)
-//                    .addHeader(FuturesApiConstants.TS_KEY_HEADER, System.currentTimeMillis()/1000)
-                    .addHeader("client_SDK_Version", "bitrue_futures-0.9.1-java")
-                    .build();
-        }
-    }
-
-    Request createRequestByGetWithApikey(String address, UrlParamsBuilder builder) {
-        return createRequestWithApikey(serverUrl, address, builder);
-    }
-
+    @Override
     RestApiRequest<ServerTime> getServerTime(){
         RestApiRequest<ServerTime> request = new RestApiRequest<>();
         UrlParamsBuilder builder = UrlParamsBuilder.build();
-        request.request = createRequestByGet("/fapi/v1/time", builder);
+        request.request = createRequestByGet("/dapi/v1/time", builder);
         request.jsonParser = (jsonWrapper -> {
             return ServerTime.builder().serverMillis(jsonWrapper.getLong("serverTime")).timeZone(jsonWrapper.getString("timezone")).build();
         });
         return request;
     }
 
+    @Override
     RestApiRequest<List<ContractInfo>> getContractList() {
         RestApiRequest<List<ContractInfo>> request = new RestApiRequest<>();
         UrlParamsBuilder builder = UrlParamsBuilder.build();
-        request.request = createRequestByGet("/fapi/v1/contracts", builder);
+        request.request = createRequestByGet("/dapi/v1/contracts", builder);
 
 
         request.jsonParser = (jsonWraper -> {
@@ -220,12 +67,13 @@ public class RestApiRequestImpl {
         return request;
     }
 
+    @Override
     RestApiRequest<OrderBook> getOrderBook(String contractName, Integer limit) {
         RestApiRequest<OrderBook> request = new RestApiRequest<OrderBook>();
         UrlParamsBuilder builder = UrlParamsBuilder.build()
                 .putToUrl("contractName", contractName)
                 .putToUrl("limit", limit);
-        request.request = createRequestByGet("/fapi/v1/depth", builder);
+        request.request = createRequestByGet("/dapi/v1/depth", builder);
 
         request.jsonParser = (jsonWrapper -> {
             OrderBook result = new OrderBook();
@@ -256,12 +104,13 @@ public class RestApiRequestImpl {
         return request;
     }
 
+    @Override
     RestApiRequest<PriceChangeTicker> get24HrTickerPriceChange(String contractName){
         RestApiRequest<PriceChangeTicker> request = new RestApiRequest<>();
         UrlParamsBuilder builder = UrlParamsBuilder.build()
                 .putToUrl("contractName", contractName);
 
-        request.request = createRequestByGet("/fapi/v1/ticker", builder);
+        request.request = createRequestByGet("/dapi/v1/ticker", builder);
 
         request.jsonParser = (jsonWrapper ->{
             PriceChangeTicker result = PriceChangeTicker.builder()
@@ -277,14 +126,14 @@ public class RestApiRequestImpl {
         return request;
     }
 
-
+    @Override
     RestApiRequest<List<KlineBar>> getKlines(String contractName, Interval interval, Integer limit){
         RestApiRequest<List<KlineBar>> request = new RestApiRequest<>();
         UrlParamsBuilder builder = UrlParamsBuilder.build()
                 .putToUrl("contractName", contractName)
                 .putToUrl("interval", interval.getValue())
                 .putToUrl("limit", limit);
-        request.request = createRequestByGet("/fapi/v1/klines", builder);
+        request.request = createRequestByGet("/dapi/v1/klines", builder);
 
         request.jsonParser = (jsonWrapper -> {
             List<KlineBar> result = new LinkedList<>();
@@ -304,6 +153,7 @@ public class RestApiRequestImpl {
         return request;
     }
 
+    @Override
     RestApiRequest<Order> postOrder(String contractName, String price, String volume, OrderType orderType,
                                     OrderSide side, PositionActiion action, PositionType positionType, String clientOrdId,
                                     TimeInForce timeInForce){
@@ -319,7 +169,7 @@ public class RestApiRequestImpl {
                 .putToPost("clientOrderId", clientOrdId)
                 .putToPost("timeInForce", timeInForce.name());
 
-        request.request = createRequestByPostWithSignature("/fapi/v1/order", builder);
+        request.request = createRequestByPostWithSignature("/dapi/v1/order", builder);
 
         request.jsonParser = (jsonWrapper -> {
             Order result = Order.builder()
@@ -333,6 +183,7 @@ public class RestApiRequestImpl {
         return request;
     }
 
+    @Override
     RestApiRequest<Order> marketOrder(String contractName, String volume, OrderSide side, PositionActiion action, PositionType positionType, String clientOrdId){
         RestApiRequest<Order> request = new RestApiRequest<>();
         UrlParamsBuilder builder = UrlParamsBuilder.build()
@@ -345,7 +196,7 @@ public class RestApiRequestImpl {
                 .putToPost("clientOrderId", clientOrdId)
                 .putToPost("timeInForce", OrderType.MARKET.name());
 
-        request.request = createRequestByPostWithSignature("/fapi/v1/order", builder);
+        request.request = createRequestByPostWithSignature("/dapi/v1/order", builder);
 
         request.jsonParser = (jsonWrapper -> {
             Order result = Order.builder()
@@ -359,13 +210,14 @@ public class RestApiRequestImpl {
         return request;
     }
 
+    @Override
     public RestApiRequest<Order> cancelOrder(String contractName, Long orderId, String clientOrdId) {
         RestApiRequest<Order> request = new RestApiRequest<>();
         UrlParamsBuilder builder = UrlParamsBuilder.build()
                 .putToPost("orderId", String.valueOf(orderId))
                 .putToPost("contractName", contractName)
                 .putToPost("clientOrderId", clientOrdId);
-        request.request = createRequestByPostWithSignature("/fapi/v1/cancel", builder);
+        request.request = createRequestByPostWithSignature("/dapi/v1/cancel", builder);
 
         request.jsonParser = (jsonWrapper -> {
             Order result = Order.builder()
@@ -374,14 +226,14 @@ public class RestApiRequestImpl {
             return result;
         });
         return request;
-
     }
 
+    @Override
     public RestApiRequest<List<Order>> getOpenOrder(String contractName) {
         RestApiRequest<List<Order>> request = new RestApiRequest<>();
         UrlParamsBuilder builder = UrlParamsBuilder.build();
         builder.putToUrl("contractName", contractName);
-        request.request = createRequestByGetWithSignature("/fapi/v1/openOrders", builder);
+        request.request = createRequestByGetWithSignature("/dapi/v1/openOrders", builder);
 
         request.jsonParser = (jsonWrapper->{
             List<Order> result = new ArrayList<>();
@@ -400,13 +252,14 @@ public class RestApiRequestImpl {
         return request;
     }
 
+    @Override
     public RestApiRequest<Order> queryOrder(String contractName, Long orderId){
         RestApiRequest<Order> request = new RestApiRequest<>();
         UrlParamsBuilder builder = UrlParamsBuilder.build();
         builder.putToUrl("contractName", contractName);
         builder.putToUrl("orderId", String.valueOf(orderId));
 
-        request.request = createRequestByGetWithSignature("/fapi/v1/order", builder);
+        request.request = createRequestByGetWithSignature("/dapi/v1/order", builder);
         request.jsonParser = (wrapper -> {
             return Order.builder().orderId(wrapper.getLong("orderId")).side(wrapper.getString("side"))
                     .executeQty(wrapper.getBigDecimalOrDefault("executedQty", BigDecimal.ZERO))
@@ -418,11 +271,12 @@ public class RestApiRequestImpl {
         return request;
     }
 
+    @Override
     public RestApiRequest<List<Account>> getAccount() {
         RestApiRequest<List<Account>> request = new RestApiRequest<>();
         UrlParamsBuilder builder = UrlParamsBuilder.build();
 
-        request.request = createRequestByGetWithSignature("/fapi/v1/account", builder);
+        request.request = createRequestByGetWithSignature("/dapi/v1/account", builder);
         request.jsonParser = (rootWrapper ->{
             List<Account> result = new ArrayList<>();
             JsonWrapperArray arr = rootWrapper.getJsonArray("account");
@@ -498,12 +352,13 @@ public class RestApiRequestImpl {
         return request;
     }
 
+    @Override
     public RestApiRequest<List<Position>> getPositions(String contractName) {
         RestApiRequest<List<Position>> request = new RestApiRequest<>();
         UrlParamsBuilder builder = UrlParamsBuilder.build();
         builder.putToUrl("contractName", contractName);
 
-        request.request = createRequestByGetWithSignature("/fapi/v1/positions", builder);
+        request.request = createRequestByGetWithSignature("/dapi/v1/positions", builder);
         request.jsonParser = (rootWrapper -> {
             List<Position> result = new ArrayList<>();
             JsonWrapperArray jsonPosList = rootWrapper.getJsonArray("positions");
@@ -527,17 +382,4 @@ public class RestApiRequestImpl {
         });
         return request;
     }
-
-//    public static void main(String[] args){
-//        ZoneId utc = ZoneId.of("Etc/UTC");
-//        DateTimeFormatter targetFormatter = DateTimeFormatter.ofPattern(
-//                "MM/dd/yyyy hh:mm:ss a zzz", Locale.ENGLISH);
-//
-//        String itsAlarmDttm = "2013-10-22T01:37:56";
-//        ZonedDateTime utcDateTime = LocalDateTime.parse(itsAlarmDttm)
-//                .atZone(ZoneId.systemDefault())
-//                .withZoneSameInstant(utc);
-//        String formatterUtcDateTime = utcDateTime.format(targetFormatter);
-//        System.out.println(formatterUtcDateTime);
-//    }
 }

@@ -23,6 +23,18 @@ public interface SyncRequestClient {
         return BitrueApiInternalFactory.getInstance().createSyncRequestClient(apiKey, secKey, requestOptions);
     }
 
+    static SyncRequestClient createInverse(){
+        return createInverse("", "", new RequestOptions());
+    }
+
+    static SyncRequestClient createInverse(String apiKey, String secKey){
+        return createInverse(apiKey, secKey, new RequestOptions());
+    }
+
+    static SyncRequestClient createInverse(String apiKey, String secKey, RequestOptions requestOptions){
+        return BitrueApiInternalFactory.getInstance().createSyncRequestInverseClient(apiKey, secKey, requestOptions);
+    }
+
     List<ContractInfo> getContractList();
 
     OrderBook getOrderBook(String contractName, Integer limit);

@@ -19,4 +19,10 @@ public class BitrueApiInternalFactory {
         RestApiRequestImpl requestImpl = new RestApiRequestImpl(apiKey, secKey, requestOptions);
         return new SyncRequestImpl(requestImpl);
     }
+
+    public SyncRequestClient createSyncRequestInverseClient(String apiKey, String secKey, RequestOptions options){
+        RequestOptions requestOptions = new RequestOptions(options);
+        InverseRestApiRquestImpl inverseRequestImpl = new InverseRestApiRquestImpl(apiKey, secKey, options);
+        return new SyncRequestImpl(inverseRequestImpl);
+    }
 }
