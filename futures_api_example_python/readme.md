@@ -7,7 +7,7 @@ Getting Started
 ``` python
 
 from bitrue.future_client import FutureClient
-client = FutureClient(api_key, secret_key)
+client = FutureClient(api_key, secret_key, biz='fapi')
 
 client.get_server_time()
 {'serverTime': 1654576137774, 'timezone': 'China Standard Time'}

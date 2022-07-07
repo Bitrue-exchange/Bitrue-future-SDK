@@ -16,8 +16,8 @@ except Exception as ex:
 
 class FutureClient(object):
 
-    API_URL =  'https://fapi.bitrue.{}/fapi'
-    FUTURES_URL = 'https://fapi.bitrue.{}/fapi'
+    API_URL =  'https://fapi.bitrue.{}/{}'
+    FUTURES_URL = 'https://fapi.bitrue.{}/{}'
     WEBSITE_URL = 'https://www.bitrue.{}'
     
     PUBLIC_API_VERSION = 'v1'
@@ -55,7 +55,7 @@ class FutureClient(object):
     ORDER_RESP_TYPE_FULL = 'FULL'
 
 
-    def __init__(self, api_key=None, api_secret=None, requests_params=None, tld='com'):
+    def __init__(self, api_key=None, api_secret=None, requests_params=None, tld='com', biz="fapi"):
         """Bitrue API Client constructor
         :param api_key: Api Key
         :type api_key: str.
@@ -63,11 +63,15 @@ class FutureClient(object):
         :type api_secret: str.
         :param requests_params: optional - Dictionary of requests params to use for all calls
         :type requests_params: dict.
+        :param tld: optional, stuffix for domain name.
+        :type tld: str.
+        :param biz: USDs-Margin Contract(fapi), Coin-Margin Contract(dapi)
+        :type biz: str.
         """
 
-        self.API_URL = self.API_URL.format(tld)
+        self.API_URL = self.API_URL.format(tld, biz)
         self.WEBSITE_URL = self.WEBSITE_URL.format(tld)
-        self.FUTURES_URL = self.FUTURES_URL.format(tld)
+        self.FUTURES_URL = self.FUTURES_URL.format(tld, biz)
         
 
         self.API_KEY = api_key
