@@ -28,7 +28,7 @@ abstract class RestApiInvoker {
             } else if (json.containKey("code")) {
 
                 int code = json.getInteger("code");
-                if (code != 200) {
+                if (code != 200 && code != 0) {
                     String message = json.getStringOrDefault("msg", "");
                     throw new BitrueApiException(BitrueApiException.EXEC_ERROR,
                             "[Executing] " + code + ": " + message);

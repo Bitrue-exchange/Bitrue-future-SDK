@@ -15,14 +15,12 @@ import com.sun.tools.corba.se.idl.constExpr.Or;
 import okhttp3.Request;
 
 import java.math.BigDecimal;
+import java.security.URIParameter;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 public class RestApiRequestImpl {
 
@@ -298,6 +296,26 @@ public class RestApiRequestImpl {
                         .vol(e.getBigDecimal("vol"))
                         .index(e.getLong("idx")).build();
                 result.add(bar);
+            });
+            return result;
+        });
+        return request;
+    }
+
+    RestApiRequest<List<Map<String, String>>> getAllMarkPrice(){
+        RestApiRequest<List<Map<String, String>>> request = new RestApiRequest<>();
+        UrlParamsBuilder builder = UrlParamsBuilder.build();
+        request.request = createRequestByGet("/fapi/v1/public_all_index_tag_price", builder);
+
+        request.jsonParser = (jsonWrapper -> {
+            List<Map<String, String>> result = new ArrayList<>();
+            JsonWrapperArray arr = jsonWrapper.getJsonArray("data");
+            arr.forEach(e -> {
+                Map<String, String> row = new HashMap<>();
+                row.put("markPrice", e.getString("tag_price"));
+                row.put("indexPrice", e.getString("index_price"));
+                row.put("contractName", e.getString("contract_name"));
+                result.add(row);
             });
             return result;
         });

@@ -48,6 +48,12 @@ public class MarketTest {
     }
 
     @Test
+    public void testMarkPrices(){
+        SyncRequestClient client = SyncRequestClient.create();
+        System.out.println(client.getAllMarkPrice());
+    }
+
+    @Test
     public void testInverseKlines(){
         SyncRequestClient client = SyncRequestClient.createInverse();
         System.out.println(client.getKlines("E-BTC-USD", Interval.forValue("1min"), 300));

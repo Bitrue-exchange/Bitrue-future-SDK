@@ -8,6 +8,7 @@ import com.bitrue.futures.sdk.client.model.market.*;
 import com.bitrue.futures.sdk.client.model.trade.Order;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author superatom
@@ -39,6 +40,12 @@ public class SyncRequestImpl implements SyncRequestClient {
     public List<KlineBar> getKlines(String contractName, Interval interval, Integer limit) {
         return RestApiInvoker.callSync(requestImpl.getKlines(contractName, interval, limit));
     }
+
+    @Override
+    public List<Map<String, String>> getAllMarkPrice() {
+        return RestApiInvoker.callSync(requestImpl.getAllMarkPrice());
+    }
+
 
     @Override
     public PriceChangeTicker get24HrTickerPriceChange(String contractName) {
