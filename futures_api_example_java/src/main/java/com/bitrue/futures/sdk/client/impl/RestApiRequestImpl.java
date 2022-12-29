@@ -1,6 +1,6 @@
 package com.bitrue.futures.sdk.client.impl;
 
-import com.bitrue.futures.sdk.client.FuturesApiConstants;
+import com.bitrue.futures.sdk.client.constant.FuturesApiConstants;
 import com.bitrue.futures.sdk.client.RequestOptions;
 import com.bitrue.futures.sdk.client.exception.BitrueApiException;
 import com.bitrue.futures.sdk.client.model.account.Account;
@@ -11,22 +11,16 @@ import com.bitrue.futures.sdk.client.model.market.*;
 import com.bitrue.futures.sdk.client.model.trade.Order;
 import com.bitrue.futures.sdk.client.utils.JsonWrapperArray;
 import com.bitrue.futures.sdk.client.utils.UrlParamsBuilder;
-import com.sun.tools.corba.se.idl.constExpr.Or;
 import okhttp3.Request;
 
 import java.math.BigDecimal;
-import java.security.URIParameter;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class RestApiRequestImpl {
 
-    private String apiKey;
-    private String secretKey;
-    private String serverUrl;
+    private final String apiKey;
+    private final String secretKey;
+    private final String serverUrl;
 
     RestApiRequestImpl(String apiKey, String secretKey, RequestOptions options) {
         this.apiKey = apiKey;
@@ -178,9 +172,7 @@ public class RestApiRequestImpl {
         RestApiRequest<ServerTime> request = new RestApiRequest<>();
         UrlParamsBuilder builder = UrlParamsBuilder.build();
         request.request = createRequestByGet("/fapi/v1/time", builder);
-        request.jsonParser = (jsonWrapper -> {
-            return ServerTime.builder().serverMillis(jsonWrapper.getLong("serverTime")).timeZone(jsonWrapper.getString("timezone")).build();
-        });
+        request.jsonParser = (jsonWrapper -> ServerTime.builder().serverMillis(jsonWrapper.getLong("serverTime")).timeZone(jsonWrapper.getString("timezone")).build());
         return request;
     }
 
@@ -219,7 +211,7 @@ public class RestApiRequestImpl {
     }
 
     RestApiRequest<OrderBook> getOrderBook(String contractName, Integer limit) {
-        RestApiRequest<OrderBook> request = new RestApiRequest<OrderBook>();
+        RestApiRequest<OrderBook> request = new RestApiRequest<>();
         UrlParamsBuilder builder = UrlParamsBuilder.build()
                 .putToUrl("contractName", contractName)
                 .putToUrl("limit", limit);
@@ -261,17 +253,14 @@ public class RestApiRequestImpl {
 
         request.request = createRequestByGet("/fapi/v1/ticker", builder);
 
-        request.jsonParser = (jsonWrapper ->{
-            PriceChangeTicker result = PriceChangeTicker.builder()
-                    .high(jsonWrapper.getBigDecimal("high"))
-                    .low(jsonWrapper.getBigDecimal("low"))
-                    .last(jsonWrapper.getBigDecimal("last"))
-                    .vol(jsonWrapper.getBigDecimal("vol"))
-                    .rose(jsonWrapper.getBigDecimal("rose"))
-                    .time(jsonWrapper.getLong("time"))
-                    .build();
-            return result;
-        });
+        request.jsonParser = (jsonWrapper -> PriceChangeTicker.builder()
+                .high(jsonWrapper.getBigDecimal("high"))
+                .low(jsonWrapper.getBigDecimal("low"))
+                .last(jsonWrapper.getBigDecimal("last"))
+                .vol(jsonWrapper.getBigDecimal("vol"))
+                .rose(jsonWrapper.getBigDecimal("rose"))
+                .time(jsonWrapper.getLong("time"))
+                .build());
         return request;
     }
 
@@ -339,14 +328,11 @@ public class RestApiRequestImpl {
 
         request.request = createRequestByPostWithSignature("/fapi/v1/order", builder);
 
-        request.jsonParser = (jsonWrapper -> {
-            Order result = Order.builder()
-                    .clientOrdId(clientOrdId).orderId(jsonWrapper.getLong("orderId")).price(new BigDecimal(price))
-                    .orgiQty(new BigDecimal(volume)).type(orderType.name()).contractName(contractName).side(side.name())
-                    .postionAction(action.name()).timeInForce(timeInForce.name())
-                    .build();
-            return result;
-        });
+        request.jsonParser = (jsonWrapper -> Order.builder()
+                .clientOrdId(clientOrdId).orderId(jsonWrapper.getLong("orderId")).price(new BigDecimal(price))
+                .orgiQty(new BigDecimal(volume)).type(orderType.name()).contractName(contractName).side(side.name())
+                .postionAction(action.name()).timeInForce(timeInForce.name())
+                .build());
 
         return request;
     }
@@ -365,14 +351,11 @@ public class RestApiRequestImpl {
 
         request.request = createRequestByPostWithSignature("/fapi/v1/order", builder);
 
-        request.jsonParser = (jsonWrapper -> {
-            Order result = Order.builder()
-                    .clientOrdId(clientOrdId).orderId(jsonWrapper.getLong("orderId"))
-                    .orgiQty(new BigDecimal(volume)).type(OrderType.MARKET.name()).contractName(contractName).side(side.name())
-                    .postionAction(action.name()).timeInForce(OrderType.MARKET.name())
-                    .build();
-            return result;
-        });
+        request.jsonParser = (jsonWrapper -> Order.builder()
+                .clientOrdId(clientOrdId).orderId(jsonWrapper.getLong("orderId"))
+                .orgiQty(new BigDecimal(volume)).type(OrderType.MARKET.name()).contractName(contractName).side(side.name())
+                .postionAction(action.name()).timeInForce(OrderType.MARKET.name())
+                .build());
 
         return request;
     }
@@ -385,12 +368,9 @@ public class RestApiRequestImpl {
                 .putToPost("clientOrderId", clientOrdId);
         request.request = createRequestByPostWithSignature("/fapi/v1/cancel", builder);
 
-        request.jsonParser = (jsonWrapper -> {
-            Order result = Order.builder()
-                    .clientOrdId(clientOrdId).orderId(jsonWrapper.getLong("orderId")).contractName(contractName)
-                    .build();
-            return result;
-        });
+        request.jsonParser = (jsonWrapper -> Order.builder()
+                .clientOrdId(clientOrdId).orderId(jsonWrapper.getLong("orderId")).contractName(contractName)
+                .build());
         return request;
 
     }
@@ -425,14 +405,12 @@ public class RestApiRequestImpl {
         builder.putToUrl("orderId", String.valueOf(orderId));
 
         request.request = createRequestByGetWithSignature("/fapi/v1/order", builder);
-        request.jsonParser = (wrapper -> {
-            return Order.builder().orderId(wrapper.getLong("orderId")).side(wrapper.getString("side"))
-                    .executeQty(wrapper.getBigDecimalOrDefault("executedQty", BigDecimal.ZERO))
-                    .price(wrapper.getBigDecimal("price")).orgiQty(wrapper.getBigDecimal("origQty"))
-                    .avgPrice(wrapper.getBigDecimalOrDefault("avgPrice", BigDecimal.ZERO))
-                    .type(wrapper.getString("type")).status(wrapper.getString("status"))
-                    .postionAction(wrapper.getString("action")).ctime(wrapper.getLong("transactTime")).build();
-        });
+        request.jsonParser = (wrapper -> Order.builder().orderId(wrapper.getLong("orderId")).side(wrapper.getString("side"))
+                .executeQty(wrapper.getBigDecimalOrDefault("executedQty", BigDecimal.ZERO))
+                .price(wrapper.getBigDecimal("price")).orgiQty(wrapper.getBigDecimal("origQty"))
+                .avgPrice(wrapper.getBigDecimalOrDefault("avgPrice", BigDecimal.ZERO))
+                .type(wrapper.getString("type")).status(wrapper.getString("status"))
+                .postionAction(wrapper.getString("action")).ctime(wrapper.getLong("transactTime")).build());
         return request;
     }
 
@@ -545,17 +523,4 @@ public class RestApiRequestImpl {
         });
         return request;
     }
-
-//    public static void main(String[] args){
-//        ZoneId utc = ZoneId.of("Etc/UTC");
-//        DateTimeFormatter targetFormatter = DateTimeFormatter.ofPattern(
-//                "MM/dd/yyyy hh:mm:ss a zzz", Locale.ENGLISH);
-//
-//        String itsAlarmDttm = "2013-10-22T01:37:56";
-//        ZonedDateTime utcDateTime = LocalDateTime.parse(itsAlarmDttm)
-//                .atZone(ZoneId.systemDefault())
-//                .withZoneSameInstant(utc);
-//        String formatterUtcDateTime = utcDateTime.format(targetFormatter);
-//        System.out.println(formatterUtcDateTime);
-//    }
 }

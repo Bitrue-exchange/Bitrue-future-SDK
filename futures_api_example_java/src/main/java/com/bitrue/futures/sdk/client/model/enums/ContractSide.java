@@ -1,19 +1,14 @@
 package com.bitrue.futures.sdk.client.model.enums;
 
-import com.bitrue.futures.sdk.client.model.market.ContractInfo;
-
 /**
  * @author superatom
  */
 
 public enum ContractSide {
 
-    FORWARD(1), REVERSE(2);
+    FORWARD(), REVERSE();
 
-    private int value;
-
-    ContractSide(int value){
-        this.value = value;
+    ContractSide(){
     }
 
     public static ContractSide forInt(int v){

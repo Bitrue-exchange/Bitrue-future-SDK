@@ -5,6 +5,9 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 
+/**
+ * Price Change Ticker
+ */
 @Builder
 @Data
 public class PriceChangeTicker {

@@ -10,7 +10,7 @@ import java.util.LinkedList;
 
 public class JsonWrapperArray {
 
-    private JSONArray array = null;
+    private JSONArray array;
 
     public JsonWrapperArray(JSONArray array) {
         this.array = array;

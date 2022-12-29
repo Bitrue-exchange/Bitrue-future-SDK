@@ -26,9 +26,7 @@ public class InverseRestApiRquestImpl extends RestApiRequestImpl{
         RestApiRequest<ServerTime> request = new RestApiRequest<>();
         UrlParamsBuilder builder = UrlParamsBuilder.build();
         request.request = createRequestByGet("/dapi/v1/time", builder);
-        request.jsonParser = (jsonWrapper -> {
-            return ServerTime.builder().serverMillis(jsonWrapper.getLong("serverTime")).timeZone(jsonWrapper.getString("timezone")).build();
-        });
+        request.jsonParser = (jsonWrapper -> ServerTime.builder().serverMillis(jsonWrapper.getLong("serverTime")).timeZone(jsonWrapper.getString("timezone")).build());
         return request;
     }
 
@@ -69,7 +67,7 @@ public class InverseRestApiRquestImpl extends RestApiRequestImpl{
 
     @Override
     RestApiRequest<OrderBook> getOrderBook(String contractName, Integer limit) {
-        RestApiRequest<OrderBook> request = new RestApiRequest<OrderBook>();
+        RestApiRequest<OrderBook> request = new RestApiRequest<>();
         UrlParamsBuilder builder = UrlParamsBuilder.build()
                 .putToUrl("contractName", contractName)
                 .putToUrl("limit", limit);
@@ -112,17 +110,14 @@ public class InverseRestApiRquestImpl extends RestApiRequestImpl{
 
         request.request = createRequestByGet("/dapi/v1/ticker", builder);
 
-        request.jsonParser = (jsonWrapper ->{
-            PriceChangeTicker result = PriceChangeTicker.builder()
-                    .high(jsonWrapper.getBigDecimal("high"))
-                    .low(jsonWrapper.getBigDecimal("low"))
-                    .last(jsonWrapper.getBigDecimal("last"))
-                    .vol(jsonWrapper.getBigDecimal("vol"))
-                    .rose(jsonWrapper.getBigDecimal("rose"))
-                    .time(jsonWrapper.getLong("time"))
-                    .build();
-            return result;
-        });
+        request.jsonParser = (jsonWrapper -> PriceChangeTicker.builder()
+                .high(jsonWrapper.getBigDecimal("high"))
+                .low(jsonWrapper.getBigDecimal("low"))
+                .last(jsonWrapper.getBigDecimal("last"))
+                .vol(jsonWrapper.getBigDecimal("vol"))
+                .rose(jsonWrapper.getBigDecimal("rose"))
+                .time(jsonWrapper.getLong("time"))
+                .build());
         return request;
     }
 
@@ -171,14 +166,11 @@ public class InverseRestApiRquestImpl extends RestApiRequestImpl{
 
         request.request = createRequestByPostWithSignature("/dapi/v1/order", builder);
 
-        request.jsonParser = (jsonWrapper -> {
-            Order result = Order.builder()
-                    .clientOrdId(clientOrdId).orderId(jsonWrapper.getLong("orderId")).price(new BigDecimal(price))
-                    .orgiQty(new BigDecimal(volume)).type(orderType.name()).contractName(contractName).side(side.name())
-                    .postionAction(action.name()).timeInForce(timeInForce.name())
-                    .build();
-            return result;
-        });
+        request.jsonParser = (jsonWrapper -> Order.builder()
+                .clientOrdId(clientOrdId).orderId(jsonWrapper.getLong("orderId")).price(new BigDecimal(price))
+                .orgiQty(new BigDecimal(volume)).type(orderType.name()).contractName(contractName).side(side.name())
+                .postionAction(action.name()).timeInForce(timeInForce.name())
+                .build());
 
         return request;
     }
@@ -198,14 +190,11 @@ public class InverseRestApiRquestImpl extends RestApiRequestImpl{
 
         request.request = createRequestByPostWithSignature("/dapi/v1/order", builder);
 
-        request.jsonParser = (jsonWrapper -> {
-            Order result = Order.builder()
-                    .clientOrdId(clientOrdId).orderId(jsonWrapper.getLong("orderId"))
-                    .orgiQty(new BigDecimal(volume)).type(OrderType.MARKET.name()).contractName(contractName).side(side.name())
-                    .postionAction(action.name()).timeInForce(OrderType.MARKET.name())
-                    .build();
-            return result;
-        });
+        request.jsonParser = (jsonWrapper -> Order.builder()
+                .clientOrdId(clientOrdId).orderId(jsonWrapper.getLong("orderId"))
+                .orgiQty(new BigDecimal(volume)).type(OrderType.MARKET.name()).contractName(contractName).side(side.name())
+                .postionAction(action.name()).timeInForce(OrderType.MARKET.name())
+                .build());
 
         return request;
     }
@@ -219,12 +208,9 @@ public class InverseRestApiRquestImpl extends RestApiRequestImpl{
                 .putToPost("clientOrderId", clientOrdId);
         request.request = createRequestByPostWithSignature("/dapi/v1/cancel", builder);
 
-        request.jsonParser = (jsonWrapper -> {
-            Order result = Order.builder()
-                    .clientOrdId(clientOrdId).orderId(jsonWrapper.getLong("orderId")).contractName(contractName)
-                    .build();
-            return result;
-        });
+        request.jsonParser = (jsonWrapper -> Order.builder()
+                .clientOrdId(clientOrdId).orderId(jsonWrapper.getLong("orderId")).contractName(contractName)
+                .build());
         return request;
     }
 
@@ -260,14 +246,12 @@ public class InverseRestApiRquestImpl extends RestApiRequestImpl{
         builder.putToUrl("orderId", String.valueOf(orderId));
 
         request.request = createRequestByGetWithSignature("/dapi/v1/order", builder);
-        request.jsonParser = (wrapper -> {
-            return Order.builder().orderId(wrapper.getLong("orderId")).side(wrapper.getString("side"))
-                    .executeQty(wrapper.getBigDecimalOrDefault("executedQty", BigDecimal.ZERO))
-                    .price(wrapper.getBigDecimal("price")).orgiQty(wrapper.getBigDecimal("origQty"))
-                    .avgPrice(wrapper.getBigDecimalOrDefault("avgPrice", BigDecimal.ZERO))
-                    .type(wrapper.getString("type")).status(wrapper.getString("status"))
-                    .postionAction(wrapper.getString("action")).ctime(wrapper.getLong("transactTime")).build();
-        });
+        request.jsonParser = (wrapper -> Order.builder().orderId(wrapper.getLong("orderId")).side(wrapper.getString("side"))
+                .executeQty(wrapper.getBigDecimalOrDefault("executedQty", BigDecimal.ZERO))
+                .price(wrapper.getBigDecimal("price")).orgiQty(wrapper.getBigDecimal("origQty"))
+                .avgPrice(wrapper.getBigDecimalOrDefault("avgPrice", BigDecimal.ZERO))
+                .type(wrapper.getString("type")).status(wrapper.getString("status"))
+                .postionAction(wrapper.getString("action")).ctime(wrapper.getLong("transactTime")).build());
         return request;
     }
 

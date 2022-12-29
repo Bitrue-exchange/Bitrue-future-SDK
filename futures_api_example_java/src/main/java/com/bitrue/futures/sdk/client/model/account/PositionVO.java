@@ -5,6 +5,9 @@ import lombok.Data;
 
 import java.util.List;
 
+/**
+ * Position Value Object details
+ */
 @Data
 @Builder
 public class PositionVO {

@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 abstract class RestApiInvoker {
-
     private static final Logger log = LoggerFactory.getLogger(RestApiInvoker.class);
     private static final OkHttpClient client = new OkHttpClient();
 
@@ -66,5 +65,4 @@ abstract class RestApiInvoker {
                     "[Invoking] Unexpected error: " + e.getMessage());
         }
     }
-
 }

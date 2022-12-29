@@ -7,8 +7,10 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
-import java.util.Date;
 
+/**
+ * Position details
+ */
 @Data
 @Builder
 public class Position {

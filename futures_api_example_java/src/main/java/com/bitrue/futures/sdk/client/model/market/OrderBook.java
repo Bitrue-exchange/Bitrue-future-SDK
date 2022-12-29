@@ -1,10 +1,13 @@
 package com.bitrue.futures.sdk.client.model.market;
 
-import com.bitrue.futures.sdk.client.FuturesApiConstants;
+import com.bitrue.futures.sdk.client.constant.FuturesApiConstants;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 import java.util.List;
 
+/**
+ * Order Book Details
+ */
 public class OrderBook {
 
     private List<OrderBookEntry> bids;

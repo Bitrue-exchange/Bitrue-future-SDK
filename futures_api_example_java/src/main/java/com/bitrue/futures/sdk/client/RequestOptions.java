@@ -1,5 +1,6 @@
 package com.bitrue.futures.sdk.client;
 
+import com.bitrue.futures.sdk.client.constant.FuturesApiConstants;
 import com.bitrue.futures.sdk.client.exception.BitrueApiException;
 
 import java.net.URL;
