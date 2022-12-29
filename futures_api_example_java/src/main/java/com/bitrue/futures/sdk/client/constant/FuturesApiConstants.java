@@ -1,4 +1,4 @@
-package com.bitrue.futures.sdk.client;
+package com.bitrue.futures.sdk.client.constant;
 
 import org.apache.commons.lang.builder.ToStringStyle;
 

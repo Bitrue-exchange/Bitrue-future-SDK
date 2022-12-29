@@ -6,7 +6,7 @@ import lombok.Data;
 import java.math.BigDecimal;
 
 /**
- *
+ * KlineBar details
  */
 @Data
 @Builder
@@ -18,5 +18,4 @@ public class KlineBar {
     private BigDecimal high;
     private BigDecimal low;
     private BigDecimal vol;
-
 }

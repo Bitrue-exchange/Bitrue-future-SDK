@@ -27,6 +27,7 @@ public class TradeTest {
     }
 
 //    @Test
+    @Test
     public void testInversePlaceOrder(){
         SyncRequestClient client = SyncRequestClient.createInverse(PrivateConfig.API_KEY, PrivateConfig.SECRET_KEY, new RequestOptions());
         int i = UUID.randomUUID().hashCode();
@@ -43,6 +44,7 @@ public class TradeTest {
 
 
 //    @Test
+    @Test
     public void testCancel(){
         SyncRequestClient client = SyncRequestClient.create(PrivateConfig.API_KEY, PrivateConfig.SECRET_KEY, new RequestOptions());
         Order ord = Order.builder().clientOrdId("1534994023").orderId(1141178101970600166L).contractName("E-ETH-USDT").build();
@@ -51,24 +53,28 @@ public class TradeTest {
     }
 
 //    @Test
+    @Test
     public void testOpenOrders(){
         SyncRequestClient client = SyncRequestClient.create(PrivateConfig.API_KEY, PrivateConfig.SECRET_KEY, new RequestOptions());
         System.out.println(client.getOpenOrder("E-ETH-USDT"));
     }
 
 //    @Test
+    @Test
     public void testInverseOpenOrders(){
         SyncRequestClient client = SyncRequestClient.createInverse(PrivateConfig.API_KEY, PrivateConfig.SECRET_KEY, new RequestOptions());
         System.out.println(client.getOpenOrder("E-BTC-USD"));
     }
 
 //    @Test
+    @Test
     public void testQueryOrder(){
         SyncRequestClient client = SyncRequestClient.create(PrivateConfig.API_KEY, PrivateConfig.SECRET_KEY, new RequestOptions());
         System.out.println(client.queryOrder("E-ETH-USDT", 1141178101970600166L));
     }
 
 //    @Test
+    @Test
     public void testInverseQueryOrder(){
         SyncRequestClient client = SyncRequestClient.createInverse(PrivateConfig.API_KEY, PrivateConfig.SECRET_KEY, new RequestOptions());
         System.out.println(client.queryOrder("E-BTC-USD", 1194156214330328799L));

@@ -1,20 +1,16 @@
 package com.bitrue.futures.sdk.client.utils;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.bitrue.futures.sdk.client.exception.BitrueApiException;
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
+import org.apache.commons.lang.StringUtils;
+
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.LinkedHashMap;
-import okhttp3.MediaType;
-import okhttp3.RequestBody;
-import org.apache.commons.lang.StringUtils;
+import java.util.*;
 
 public class UrlParamsBuilder {
 

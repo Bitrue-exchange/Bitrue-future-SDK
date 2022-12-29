@@ -1,6 +1,5 @@
 package com.bitrue.futures.sdk.client.impl;
 
-import com.bitrue.futures.sdk.client.FuturesApiConstants;
 import com.bitrue.futures.sdk.client.exception.BitrueApiException;
 import com.bitrue.futures.sdk.client.utils.UrlParamsBuilder;
 import org.apache.commons.codec.binary.Hex;
@@ -12,8 +11,6 @@ import java.security.NoSuchAlgorithmException;
 
 class ApiSignature {
 
-//    static final String op = "op";
-//    static final String opValue = "auth";
     private static final String signatureMethodValue = "HmacSHA256";
     public static final String signatureVersionValue = "2";
 
@@ -22,13 +19,6 @@ class ApiSignature {
         if (accessKey == null || "".equals(accessKey) || secretKey == null || "".equals(secretKey)) {
             throw new BitrueApiException(BitrueApiException.KEY_MISSING, "API key and secret key are required");
         }
-
-//        if(builder.getMethod().equals("GET")){
-//            builder.putToUrl("recvWindow", Long.toString(FuturesApiConstants.DEFAULT_RECEIVING_WINDOW));
-//        }
-//        else if(builder.getMethod().equals("POST")){
-//            builder.putToPost("recvWindow",Long.toString(FuturesApiConstants.DEFAULT_RECEIVING_WINDOW));
-//        }
 
         Mac hmacSha256;
         try {
@@ -49,5 +39,4 @@ class ApiSignature {
         return actualSign;
 
     }
-
 }

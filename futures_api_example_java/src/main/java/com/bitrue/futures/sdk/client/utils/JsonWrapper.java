@@ -220,7 +220,7 @@ public class JsonWrapper {
 
     public JsonWrapperArray getJsonArray(String name) {
         checkMandatoryField(name);
-        JSONArray array = null;
+        JSONArray array;
         try {
             array = json.getJSONArray(name);
         } catch (Exception e) {

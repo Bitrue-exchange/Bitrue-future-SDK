@@ -11,7 +11,7 @@ public enum Interval {
     /**
      * value
      */
-    private String value;
+    private final String value;
 
     Interval(String v){
         this.value = v;

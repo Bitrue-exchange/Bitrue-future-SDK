@@ -3,11 +3,10 @@ package com.bitrue.futures.sdk.client.model.enums;
 /**
  * @author superatom
  */
-
 public enum PositionType {
     CROSS(1), ISOLATED(2);
 
-    private int value;
+    private final int value;
     PositionType(int i){
         this.value = i;
     }
